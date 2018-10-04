@@ -25,20 +25,21 @@ private:
 	class StringValue {
 	public:
 		StringValue(const char* rhs = "");
-		
-		
-	private:
-		const char* val;
-		unsigned int cnt = 1;
+		~StringValue();
 
-		void incrementRefCount(); //cnt++;
+		char* getData();
 
+		unsigned int getRefCount() const;
+		
+		void incrementRefCount();
 		void decrementRefCount();
-			/*cnt--;
-			if (cnt == 0) {
-				delete[] val;
-			}*/
+
+	private:
+		char* data;
+		unsigned int cnt = 1;
 	};
+
+	StringValue* strval;
 
 };
 
