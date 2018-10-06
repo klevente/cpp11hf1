@@ -14,14 +14,18 @@ int main() {
 	s4 += s;
 	std::cout << s4 << "\n";
 
-	auto c = s4[1];
+	char c = s4[1];
 
-	
+	s4[1] = 'x';
+	std::cout << s4 << "\n";
 
 	MyString s7;
 	std::cin >> s7;
 
-	std::cout << s7;
+	std::cout << s7 << "\n";
+
+	MyString s8;
+	std::cout << s8 << "\n";
 
 	std::cin.get();
 

@@ -1,7 +1,10 @@
 #pragma once
 #include <iostream>
+#include <map>
 
 class MyString {
+private:
+	class CharProxy;
 public:
 
 	MyString(const char* rhs = "");
@@ -21,7 +24,7 @@ public:
 
 	size_t length() const;
 
-	char& operator[](size_t i);
+	MyString::CharProxy operator[](size_t i);
 	const char& operator[](size_t i) const;
 
 	const char* c_str() const;
@@ -48,6 +51,19 @@ private:
 
 	StringValue* strval;
 
+	class CharProxy {
+	public:
+		CharProxy(MyString& str, size_t idx);
+
+		CharProxy& operator=(char c);
+
+		operator char() const;
+
+	private:
+		MyString& str;
+		const size_t idx;
+	};
+	static std::map<const char*, MyString::StringValue*> string_storage;
 };
 
 std::ostream& operator<<(std::ostream& os, const MyString& str);

@@ -3,12 +3,9 @@
 
 #include <cstring>
 
-MyString::MyString(const char* rhs) {
-	strval = new StringValue{ rhs };
-}
+MyString::MyString(const char* rhs) : strval{ new StringValue{ rhs } } { }
 
-MyString::MyString(const MyString& rhs) {
-	strval = rhs.strval;
+MyString::MyString(const MyString& rhs) : strval{ rhs.strval } {
 	strval->incrementRefCount();
 }
 
@@ -81,14 +78,15 @@ size_t MyString::length() const {
 	return strlen(strval->getData());
 }
 
-char& MyString::operator[](size_t i) {
-	if (strval->getRefCount() != 1) {
+MyString::CharProxy MyString::operator[](size_t i) {
+	/*if (strval->getRefCount() != 1) {
 		StringValue* newval = new StringValue(strval->getData());
 		strval->decrementRefCount();
 		strval = newval;
 	}
 	
-	return strval->getData()[i];
+	return strval->getData()[i];*/
+	return CharProxy{ *this, i };
 }
 
 const char& MyString::operator[](size_t i) const {
@@ -106,9 +104,9 @@ void MyString::remove_str_val() {
 	}
 }
 
-MyString::StringValue::StringValue(const char* rhs) {
-	data = new char[strlen(rhs) + 1];
+MyString::StringValue::StringValue(const char* rhs) : data{ new char[strlen(rhs) + 1] } {
 	strcpy(data, rhs);
+	string_storage[rhs] = this;
 }
 
 MyString::StringValue::~StringValue() {
@@ -137,9 +135,26 @@ std::ostream& operator<<(std::ostream& os, const MyString& str) {
 }
 
 std::istream& operator>>(std::istream& is, MyString& str) {
-	char* data = new char[1];
+	char data[100]; // ?
 	is >> data;
 	str = MyString{ data };
-	delete[] data; // !!
 	return is;
+}
+
+MyString::CharProxy::CharProxy(MyString& str, size_t idx) : str(str), idx(idx) { }
+
+MyString::CharProxy& MyString::CharProxy::operator=(char c) {
+	if (str.strval->getRefCount() != 1) {
+		StringValue* newval = new StringValue(str.strval->getData());
+		str.strval->decrementRefCount();
+		str.strval = newval;
+	}
+
+	str.strval->getData()[idx] = c;
+
+	return *this;
+}
+
+MyString::CharProxy::operator char() const {
+	return str.strval->getData()[idx];
 }
