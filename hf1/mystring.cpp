@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "mystring.h"
 
 #include <cstring>
@@ -12,7 +13,19 @@ MyString::MyString(const MyString& rhs) {
 }
 
 MyString& MyString::operator=(const MyString& rhs) {
-	// TODO: insert return statement here
+	if (this == &rhs) {
+		return *this;
+	}
+
+	strval->decrementRefCount();
+	if (strval->getRefCount() == 0) {
+		delete strval;
+	}
+
+	strval = rhs.strval;
+	strval->incrementRefCount();
+
+	return *this;
 }
 
 MyString::MyString(MyString&& rhs) {
@@ -20,11 +33,12 @@ MyString::MyString(MyString&& rhs) {
 
 MyString& MyString::operator=(MyString&& rhs) {
 	// TODO: insert return statement here
+	return *this;
 }
 
 MyString::~MyString() {
 	strval->decrementRefCount();
-	if (strval->getRefCount == 0) {
+	if (strval->getRefCount() == 0) {
 		delete strval;
 	}
 }
@@ -35,6 +49,7 @@ MyString MyString::operator+(const MyString& rhs) const {
 
 MyString& MyString::operator+=(const MyString& rhs) {
 	// TODO: insert return statement here
+	return *this;
 }
 
 size_t MyString::length() const {
@@ -43,14 +58,16 @@ size_t MyString::length() const {
 
 char& MyString::operator[](size_t i) {
 	// TODO: insert return statement here
+	return strval->getData()[i];
 }
 
 const char& MyString::operator[](size_t i) const {
-	return strval->getData[i];
+	return strval->getData()[i];
 }
 
 MyString::StringValue::StringValue(const char* rhs) {
-	data = new char[strlen(rhs)];
+	data = new char[strlen(rhs) + 1];
+	strcpy(data, rhs);
 }
 
 MyString::StringValue::~StringValue() {
@@ -71,4 +88,13 @@ void MyString::StringValue::incrementRefCount() {
 
 void MyString::StringValue::decrementRefCount() {
 	cnt--;
+}
+
+std::ostream& operator<<(std::ostream& os, const MyString& str) {
+	os << str.c_str();
+	return os;
+}
+
+std::istream& operator>>(std::istream& is, const MyString& str) {
+	return is;
 }

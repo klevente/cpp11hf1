@@ -21,6 +21,10 @@ public:
 	char& operator[](size_t i);
 	const char& operator[](size_t i) const;
 
+	const char* c_str() const {
+		return strval->getData();
+	}
+
 private:
 	class StringValue {
 	public:
