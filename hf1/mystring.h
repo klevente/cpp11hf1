@@ -16,14 +16,15 @@ public:
 	MyString operator+(const MyString& rhs) const;
 	MyString& operator+=(const MyString& rhs);
 
+	MyString operator+(char rhs) const;
+	MyString& operator+=(char rhs);
+
 	size_t length() const;
 
 	char& operator[](size_t i);
 	const char& operator[](size_t i) const;
 
-	const char* c_str() const {
-		return strval->getData();
-	}
+	const char* c_str() const;
 
 private:
 	class StringValue {
@@ -43,10 +44,12 @@ private:
 		unsigned int cnt = 1;
 	};
 
+	void remove_str_val();
+
 	StringValue* strval;
 
 };
 
 std::ostream& operator<<(std::ostream& os, const MyString& str);
 
-std::istream& operator>>(std::istream& is, const MyString& str);
+std::istream& operator>>(std::istream& is, MyString& str);
