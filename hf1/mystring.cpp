@@ -2,11 +2,22 @@
 #include "mystring.h"
 
 #include <cstring>
+#include <algorithm>
 
-std::map<const char*, MyString::StringValue*> MyString::string_storage;
+std::set<MyString::StringValue*> MyString::string_storage;
 
-MyString::MyString(const char* rhs) : strval{ new StringValue{ rhs } } { 
-	string_storage[rhs] = strval;
+MyString::MyString(const char* rhs) {
+	const auto& it = std::find_if(string_storage.begin(), string_storage.end(), [&rhs](StringValue* s) {
+		return strcmp(rhs, s->getData()) == 0;
+	});
+	
+	if (it != string_storage.end()) {
+		strval = *it;
+		strval->increment_ref_count();
+	} else {
+		strval = new StringValue{ rhs };
+		string_storage.insert(strval);
+	}
 }
 
 MyString::MyString(const MyString& rhs) : strval{ rhs.strval } {
@@ -83,13 +94,6 @@ size_t MyString::length() const {
 }
 
 MyString::CharProxy MyString::operator[](size_t i) {
-	/*if (strval->getRefCount() != 1) {
-		StringValue* newval = new StringValue(strval->getData());
-		strval->decrementRefCount();
-		strval = newval;
-	}
-	
-	return strval->getData()[i];*/
 	return CharProxy{ *this, i };
 }
 
@@ -104,6 +108,7 @@ const char* MyString::c_str() const {
 void MyString::remove_str_val() {
 	strval->decrement_ref_count();
 	if (strval->getRefCount() == 0) {
+		string_storage.erase(strval);
 		delete strval;
 	}
 }
@@ -148,6 +153,7 @@ MyString::CharProxy::CharProxy(MyString& str, size_t idx) : str(str), idx(idx) {
 
 MyString::CharProxy& MyString::CharProxy::operator=(char c) {
 	if (str.strval->getRefCount() != 1) {
+		
 		StringValue* newval = new StringValue(str.strval->getData());
 		str.strval->decrement_ref_count();
 		str.strval = newval;

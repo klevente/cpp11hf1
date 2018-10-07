@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <map>
+#include <set>
 
 class MyString {
 private:
@@ -63,7 +63,7 @@ private:
 		MyString& str;
 		const size_t idx;
 	};
-	static std::map<const char*, StringValue*> string_storage;
+	static std::set<StringValue*> string_storage;
 	//static char X;
 };
 

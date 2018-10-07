@@ -3,7 +3,7 @@
 
 int main() {
 	MyString s = "bla";
-	MyString s2 = "ble";
+	MyString s2 = "bla";
 	MyString s3 = s + s2;
 	MyString s4 = s3 + 'x';
 
