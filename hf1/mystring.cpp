@@ -3,10 +3,14 @@
 
 #include <cstring>
 
-MyString::MyString(const char* rhs) : strval{ new StringValue{ rhs } } { }
+std::map<const char*, MyString::StringValue*> MyString::string_storage;
+
+MyString::MyString(const char* rhs) : strval{ new StringValue{ rhs } } { 
+	string_storage[rhs] = strval;
+}
 
 MyString::MyString(const MyString& rhs) : strval{ rhs.strval } {
-	strval->incrementRefCount();
+	strval->increment_ref_count();
 }
 
 MyString& MyString::operator=(const MyString& rhs) {
@@ -14,7 +18,7 @@ MyString& MyString::operator=(const MyString& rhs) {
 		remove_str_val();
 
 		strval = rhs.strval;
-		strval->incrementRefCount();
+		strval->increment_ref_count();
 	}
 
 	return *this;
@@ -22,7 +26,7 @@ MyString& MyString::operator=(const MyString& rhs) {
 
 MyString::MyString(MyString&& rhs) {
 	strval = rhs.strval;
-	strval->incrementRefCount();
+	strval->increment_ref_count();
 }
 
 MyString& MyString::operator=(MyString&& rhs) {
@@ -30,7 +34,7 @@ MyString& MyString::operator=(MyString&& rhs) {
 		remove_str_val();
 
 		strval = rhs.strval;
-		strval->incrementRefCount();
+		strval->increment_ref_count();
 	}
 	
 	return *this;
@@ -98,7 +102,7 @@ const char* MyString::c_str() const {
 }
 
 void MyString::remove_str_val() {
-	strval->decrementRefCount();
+	strval->decrement_ref_count();
 	if (strval->getRefCount() == 0) {
 		delete strval;
 	}
@@ -106,7 +110,6 @@ void MyString::remove_str_val() {
 
 MyString::StringValue::StringValue(const char* rhs) : data{ new char[strlen(rhs) + 1] } {
 	strcpy(data, rhs);
-	string_storage[rhs] = this;
 }
 
 MyString::StringValue::~StringValue() {
@@ -121,11 +124,11 @@ unsigned int MyString::StringValue::getRefCount() const {
 	return cnt;
 }
 
-void MyString::StringValue::incrementRefCount() {
+void MyString::StringValue::increment_ref_count() {
 	cnt++;
 }
 
-void MyString::StringValue::decrementRefCount() {
+void MyString::StringValue::decrement_ref_count() {
 	cnt--;
 }
 
@@ -146,7 +149,7 @@ MyString::CharProxy::CharProxy(MyString& str, size_t idx) : str(str), idx(idx) {
 MyString::CharProxy& MyString::CharProxy::operator=(char c) {
 	if (str.strval->getRefCount() != 1) {
 		StringValue* newval = new StringValue(str.strval->getData());
-		str.strval->decrementRefCount();
+		str.strval->decrement_ref_count();
 		str.strval = newval;
 	}
 

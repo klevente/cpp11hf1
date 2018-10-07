@@ -39,8 +39,8 @@ private:
 
 		unsigned int getRefCount() const;
 		
-		void incrementRefCount();
-		void decrementRefCount();
+		void increment_ref_count();
+		void decrement_ref_count();
 
 	private:
 		char* data;
@@ -63,7 +63,8 @@ private:
 		MyString& str;
 		const size_t idx;
 	};
-	static std::map<const char*, MyString::StringValue*> string_storage;
+	static std::map<const char*, StringValue*> string_storage;
+	//static char X;
 };
 
 std::ostream& operator<<(std::ostream& os, const MyString& str);
