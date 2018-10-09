@@ -64,7 +64,6 @@ private:
 		const size_t idx;
 	};
 	static std::set<StringValue*> string_storage;
-	//static char X;
 };
 
 std::ostream& operator<<(std::ostream& os, const MyString& str);
