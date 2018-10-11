@@ -15,6 +15,7 @@ int main() {
 	std::cout << s4 << "\n";
 
 	char c = s4[1];
+	std::cout << c << "\n";
 
 	s4[1] = 'x';
 	std::cout << s4 << "\n";
