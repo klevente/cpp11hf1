@@ -143,13 +143,20 @@ std::ostream& operator<<(std::ostream& os, const MyString& str) {
 }
 
 std::istream& operator>>(std::istream& is, MyString& str) {
-	char data[100]; // ?
-	is >> data;
-	str = MyString{ data };
+	MyString temp;
+	char c;
+
+	while (is.get(c)) {
+		if (c == ' ') {
+			break;
+		}
+		temp += c;
+	}
+	str = temp;
 	return is;
 }
 
-MyString::CharProxy::CharProxy(MyString& str, size_t idx) : str(str), idx(idx) { }
+MyString::CharProxy::CharProxy(MyString& str, size_t idx) : str{ str }, idx{ idx } { }
 
 MyString::CharProxy& MyString::CharProxy::operator=(char c) {
 	if (str.strval->getRefCount() != 1) {
