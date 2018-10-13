@@ -35,9 +35,9 @@ private:
 		StringValue(const char* rhs = "");
 		~StringValue();
 
-		char* getData();
+		char* get_data();
 
-		unsigned int getRefCount() const;
+		unsigned int get_ref_count() const;
 		
 		void increment_ref_count();
 		void decrement_ref_count();
@@ -56,12 +56,15 @@ private:
 		CharProxy(MyString& str, size_t idx);
 
 		CharProxy& operator=(char c);
+		CharProxy& operator=(const CharProxy& cp);
 
 		operator char() const;
 
 	private:
 		MyString& str;
 		const size_t idx;
+
+		void create_new_val();
 	};
 	static std::set<StringValue*> string_storage;
 };

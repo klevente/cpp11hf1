@@ -8,7 +8,7 @@ std::set<MyString::StringValue*> MyString::string_storage;
 
 MyString::MyString(const char* rhs) {
 	const auto& it = std::find_if(string_storage.begin(), string_storage.end(), [&rhs](StringValue* s) {
-		return strcmp(rhs, s->getData()) == 0;
+		return strcmp(rhs, s->get_data()) == 0;
 	});
 	
 	if (it != string_storage.end()) {
@@ -57,8 +57,8 @@ MyString::~MyString() {
 
 MyString MyString::operator+(const MyString& rhs) const {
 	char* newdata = new char[length() + rhs.length() + 1];
-	strcpy(newdata, strval->getData());
-	strcat(newdata, rhs.strval->getData());
+	strcpy(newdata, strval->get_data());
+	strcat(newdata, rhs.strval->get_data());
 
 	MyString ret{ newdata };
 
@@ -74,7 +74,7 @@ MyString& MyString::operator+=(const MyString& rhs) {
 MyString MyString::operator+(char rhs) const {
 	size_t len = length() + 1;
 	char* newdata = new char[len + 1];
-	strcpy(newdata, strval->getData());
+	strcpy(newdata, strval->get_data());
 	newdata[len - 1] = rhs;
 	newdata[len] = '\0';
 
@@ -90,7 +90,7 @@ MyString& MyString::operator+=(char rhs) {
 }
 
 size_t MyString::length() const {
-	return strlen(strval->getData());
+	return strlen(strval->get_data());
 }
 
 MyString::CharProxy MyString::operator[](size_t i) {
@@ -98,16 +98,16 @@ MyString::CharProxy MyString::operator[](size_t i) {
 }
 
 const char& MyString::operator[](size_t i) const {
-	return strval->getData()[i];
+	return strval->get_data()[i];
 }
 
 const char* MyString::c_str() const {
-	return strval->getData();
+	return strval->get_data();
 }
 
 void MyString::remove_str_val() {
 	strval->decrement_ref_count();
-	if (strval->getRefCount() == 0) {
+	if (strval->get_ref_count() == 0) {
 		string_storage.erase(strval);
 		delete strval;
 	}
@@ -121,11 +121,11 @@ MyString::StringValue::~StringValue() {
 	delete[] data;
 }
 
-char* MyString::StringValue::getData() {
+char* MyString::StringValue::get_data() {
 	return data;
 }
 
-unsigned int MyString::StringValue::getRefCount() const {
+unsigned int MyString::StringValue::get_ref_count() const {
 	return cnt;
 }
 
@@ -159,18 +159,30 @@ std::istream& operator>>(std::istream& is, MyString& str) {
 MyString::CharProxy::CharProxy(MyString& str, size_t idx) : str{ str }, idx{ idx } { }
 
 MyString::CharProxy& MyString::CharProxy::operator=(char c) {
-	if (str.strval->getRefCount() != 1) {
-		
-		StringValue* newval = new StringValue(str.strval->getData());
-		str.strval->decrement_ref_count();
-		str.strval = newval;
-	}
+	create_new_val();
 
-	str.strval->getData()[idx] = c;
+	str.strval->get_data()[idx] = c;
+
+	return *this;
+}
+
+MyString::CharProxy& MyString::CharProxy::operator=(const CharProxy& cp) {
+	create_new_val();
+
+	str.strval->get_data()[idx] = cp.str.c_str()[idx];
 
 	return *this;
 }
 
 MyString::CharProxy::operator char() const {
-	return str.strval->getData()[idx];
+	return str.strval->get_data()[idx];
+}
+
+void MyString::CharProxy::create_new_val() {
+	if (str.strval->get_ref_count() != 1) {
+
+		StringValue* newval = new StringValue(str.strval->get_data());
+		str.strval->decrement_ref_count();
+		str.strval = newval;
+	}
 }
