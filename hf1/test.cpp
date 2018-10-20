@@ -20,10 +20,10 @@ int main() {
 	s4[1] = 'x';
 	std::cout << s4 << "\n";
 
-	//MyString s7;
-	//std::cin >> s7;
+	MyString s7;
+	std::cin >> s7;
 
-	//std::cout << s7 << "\n";
+	std::cout << s7 << "\n";
 
 	MyString s8;
 	std::cout << s8 << "\n";
@@ -32,7 +32,7 @@ int main() {
 
 	std::cout << s << "\n";
 
-	std::cin.get();
+	//std::cin.get();
 
 	return 0;
 }
