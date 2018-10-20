@@ -37,7 +37,7 @@ MyString& MyString::operator=(const MyString& rhs) {
 
 MyString::MyString(MyString&& rhs) {
 	strval = rhs.strval;
-	strval->increment_ref_count();
+	rhs.strval = nullptr;
 }
 
 MyString& MyString::operator=(MyString&& rhs) {
@@ -45,7 +45,7 @@ MyString& MyString::operator=(MyString&& rhs) {
 		remove_str_val();
 
 		strval = rhs.strval;
-		strval->increment_ref_count();
+		rhs.strval = nullptr;
 	}
 	
 	return *this;
@@ -106,10 +106,12 @@ const char* MyString::c_str() const {
 }
 
 void MyString::remove_str_val() {
-	strval->decrement_ref_count();
-	if (strval->get_ref_count() == 0) {
-		string_storage.erase(strval);
-		delete strval;
+	if (strval) {
+		strval->decrement_ref_count();
+		if (strval->get_ref_count() == 0) {
+			string_storage.erase(strval);
+			delete strval;
+		}
 	}
 }
 
